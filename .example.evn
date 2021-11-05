@@ -1,0 +1,20 @@
+ DB_CONNECTION=***
+ DB_HOST=***
+ DB_PORT=***
+ DB_NAME=***
+ DB_USERNAME=***
+ DB_PASSWORD=***
+
+
+ ###
+
+ APP_HOST=***
+ APP_PORT=***
+
+ ####
+
+ MAIL_USER=***
+ MAIL_PASSWORD=***
+ MAIL_HOST=smtp.gmail.com
+ MAIL_PORT=587
+ 

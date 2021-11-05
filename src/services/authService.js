@@ -1,12 +1,16 @@
+require('dotenv').config();
+
 import UserModel from '../models/userModel'
 import bcrypt from 'bcrypt'
 import uuidv4 from 'uuid/v4'
-import { transError, transSuccess } from '../../lang/vi'
-import { reject } from 'bluebird';
+import { transError, transSuccess, transMail } from '../../lang/vi'
+import sendMail from '../config/mailer'
+
+
 let saltRounds = 7;
 
 
-let register = (email, gender, password) => {
+let register = (email, gender, password, protocol, host) => {
     return new Promise(async (resolve, reject) => {
         let userByEmail = await UserModel.findByEmail(email)
         if (userByEmail) {
@@ -30,11 +34,34 @@ let register = (email, gender, password) => {
             }
         }
         let user = await UserModel.createNew(userItem)
-        resolve(transSuccess.userCreated(email))
+        let linkVerify = `${protocol}://${host}/verify/${user.local.verifyToken}`
+        //send email
+        sendMail(email, transMail.subject, transMail.template(linkVerify))
+            .then(success => {
+                resolve(transSuccess.userCreated(email))
+            })
+            .catch(async error => {
+                //xoa user when email gui khong thanh cong
+                await UserModel.removeById(user._id)
+                console.log(error)
+                reject(transMail.sendFailed)
+            })
 
     })
 }
 
+let verifyAccount = (token) => {
+    return new Promise(async (resolve, reject) => {
+       const userFound  = await UserModel.findByToken(token)
+       if(!userFound){
+        return reject(transError.token_undefined)
+       }
+        await UserModel.verifyUser(token)
+        return resolve(transSuccess.accountActived)
+    })
+}
+
 module.exports = {
-    register: register
+    register: register,
+    verifyAccount: verifyAccount
 }

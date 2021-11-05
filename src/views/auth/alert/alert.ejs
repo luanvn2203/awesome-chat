@@ -1,13 +1,16 @@
 <% if(errors != "") { %>
-    <% errors.forEach((item)=>{ %>
-        <script>openRegisterModal();</script>
-        <div class="alert alert-danger"><%- item %></div>
-    <%  }); %>
-<% } %>
-
-<% if(success != "") { %>
-    <% success.forEach((item)=>{ %>
-        <script>openLoginModal();</script>
-        <div class="alert alert-success"><%- item %></div>
-    <%  }); %>
-<% } %>
+    <% errors.forEach(item =>{if(item.includes('Email is used by someone.') || item.includes('Invalid email format (example@nhutluan.com)') || item.includes('Password at least 8 character within upper,lower case, number, and special chars.') || item.includes('Confirmation password must equal to password.')){%>
+    <script>openRegisterModal()</script>
+    <div class="alert alert-danger"><%- item %></div>
+    <%} else {%>
+    <script>openLoginModal()</script>
+    <div class="alert alert-danger"><%- item %></div>
+    <%}}); %>
+    <% } %>
+    
+    <% if(success != "") { %>
+    <% success.forEach(item =>{ %>
+    <script>openLoginModal()</script>
+    <div class="alert alert-success"><%- item %></div>
+    <% }); %>
+    <% } %>

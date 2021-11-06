@@ -1,4 +1,5 @@
 import { body, validationResult } from "express-validator/check"
+import { transSuccess } from "../../lang/vi"
 import { auth } from '../services/index'
 
 let getLoginRegister = async (req, res, next) => {
@@ -51,8 +52,37 @@ let verifyAccount = async (req, res, next) => {
     }
 }
 
+let getLogout = async (req, res, next) => {
+    req.logout() //remove session passport user trong mongoDB
+    req.flash("success", transSuccess.logout_success)
+    return res.redirect("/login-register");
+}
+
+/**
+ * Kiem tra da dang nhap roi thi moi next request vao home
+ */
+let checkLoggedIn = (req, res, next) => {
+    if (!req.isAuthenticated()) {
+        return res.redirect("/login-register");
+    }
+    next()
+}
+
+/**
+ * Kiem tra da dang xuat chua roi thi da ve trang login
+ */
+let checkLoggedOut = (req, res, next) => {
+    if (req.isAuthenticated()) {
+        return res.redirect("/");
+    }
+    next()
+}
+
 export default {
     getLoginRegister,
     postRegister,
-    verifyAccount
+    verifyAccount,
+    getLogout,
+    checkLoggedIn,
+    checkLoggedOut
 }

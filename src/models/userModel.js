@@ -36,7 +36,6 @@ UserSchema.statics = {
         return this.create(item)
     },
     findByEmail(email) {
-        console.log(email)
         return this.findOne({ "local.email": email }).exec();
     },
     removeById(id) {

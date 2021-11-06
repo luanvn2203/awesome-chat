@@ -27,22 +27,9 @@ let initPassportFacebook = () => {
             if (user) {
                 return done(null, user, req.flash("success", transSuccess.login_success(user.username)))
             }
-            // let newUserItem = {
-            //     username: profile.displayName,
-            //     gender: profile.gender,
-            //     local: {
-            //         isActive: true
-            //     },
-            //     facebook: {
-            //         uid: profile.id,
-            //         token: accessToken,
-            //         email: profile.emails[0].value
-            //     }
-            // }
-
             let newUserItem = {
                 username: profile.displayName,
-                gender: profile.gender,
+                gender: "male",
                 local: {
                     isActive: true
                 },
@@ -55,8 +42,10 @@ let initPassportFacebook = () => {
             if (profile.emails) {
                 newUserItem.facebook.email = profile.emails[0].value
             }
+            if (profile.gender) {
+                newUserItem.gender = profile.gender
+            }
 
-            console.log(newUserItem)
             let newUser = await UserModel.createNew(newUserItem);
             return done(null, newUser, req.flash("success", transSuccess.login_success(newUser.username)))
 

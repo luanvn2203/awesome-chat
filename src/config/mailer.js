@@ -18,7 +18,6 @@ let sendMail = (to, subject, htmlContent) =>{
             pass: adminEmailPassword
         }
     })
-    console.log(adminEmail,adminEmailPassword)
     let options = {
         from: adminEmail,
         to: to,

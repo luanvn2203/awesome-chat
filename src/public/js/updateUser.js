@@ -85,19 +85,31 @@ $(document).ready(function () {
             processData: false,
             data: userAvatar,
             success: function (result) {
-                //
+                console.log(result);
+                //display success
+                $(".user-modal-alert-success").find("span").text(result.message)
+                $(".user-modal-alert-success").css("display", "block")
+                //update small navbar avatar
+                $("#navbar-avatar").attr("src",result.imageSrc)
+                //update original image src in usermodal
+                originAvatarSrc = result.imageSrc
+
+                $("#input-btn-cancel-update-user").click()
+
             },
             error: function (error) {
-                //
+                //display error
+                $(".user-modal-alert-error").find("span").text(error.responseText)
+                $(".user-modal-alert-error").css("display", "block")
+                $("#input-btn-cancel-update-user").click()
             }
         })
-        // console.log(userAvatar)
-        // console.log(userInfor)
     })
 
     $("#input-btn-cancel-update-user").bind("click", function () {
         userAvatar = null
         userInfor = {}
+        $("#input-change-avatar").val(null);
         $("#user-modal-avatar").attr("src", originAvatarSrc)
     })
 

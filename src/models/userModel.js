@@ -50,16 +50,19 @@ UserSchema.statics = {
     findByToken(token) {
         return this.findOne({ "local.verifyToken": token })
     },
-    findUserById(id){
+    findUserById(id) {
         return this.findById(id).exec()
     },
-    findByFacebookUid(uid){
+    findByFacebookUid(uid) {
         return this.findOne({ "facebook.uid": uid }).exec();
+    },
+    updateUser(id, item) {
+        return this.findByIdAndUpdate(id, item).exec()
     }
 }
 
 UserSchema.methods = {
-    comparePassword(password){
+    comparePassword(password) {
         return bcrypt.compare(password, this.local.password) // return true or false (PROMISE)
     }
 }

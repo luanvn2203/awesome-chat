@@ -11,7 +11,9 @@ export const transError = {
     account_registered_but_not_active: "Account has registered before but not active.",
     token_undefined: "Token is expired or undefined",
     login_failed: "Email or password is incorrect",
-    server_error: "Internal server error, try again."
+    server_error: "Internal server error, try again.",
+    avatar_type_error: "File type is incorrect(jpg,png,jpeg)",
+    avatar_size: "Image size too large (less than 1MB accepted)"
 }
 
 export const transSuccess = {
@@ -22,7 +24,8 @@ export const transSuccess = {
     login_success: (username) => {
         return `Hello ${username}, have a nice day.`
     },
-    logout_success: "See you again."
+    logout_success: "See you again.",
+    avatar_update_success: "Update avatar successfylly."
 }
 
 export const transMail = {

@@ -64,7 +64,7 @@ let updateInfo = async (req, res) => {
         errors.forEach(item => {
             errorArr.push(item.msg)
         })
-       
+
         return res.status(500).send(errorArr)
     }
     try {
@@ -80,7 +80,32 @@ let updateInfo = async (req, res) => {
     }
 }
 
+let updateUserPassword = async (req, res) => {
+    let errorArr = []
+    let validateionError = validationResult(req)
+
+    if (!validateionError.isEmpty()) {
+        let errors = Object.values(validateionError.mapped());
+        errors.forEach(item => {
+            errorArr.push(item.msg)
+        })
+        req.flash("errors", errorArr)
+        return res.status(500).send(errorArr)
+    }
+    try {
+        let updateUserItem = req.body
+        await user.updatePassword(req.user.id, updateUserItem)
+        let result = {
+            message: transSuccess.user_password_updated
+        }
+        return res.status(200).send(result)
+    } catch (error) {
+        return res.status(500).send(error)
+    }
+}
+
 module.exports = {
     updateAvatar: updateAvatar,
-    updateInfo: updateInfo
+    updateInfo: updateInfo,
+    updateUserPassword: updateUserPassword
 }

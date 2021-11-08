@@ -19,7 +19,9 @@ export const transError = {
     login_failed: "Email or password is incorrect",
     server_error: "Internal server error, try again.",
     avatar_type_error: "File type is incorrect(jpg,png,jpeg)",
-    avatar_size: "Image size too large (less than 1MB accepted)"
+    avatar_size: "Image size too large (less than 1MB accepted)",
+    account_undefined:"Not found this account",
+    old_password_incorrect: "Current password is not correct"
 }
 
 export const transSuccess = {
@@ -31,7 +33,8 @@ export const transSuccess = {
         return `Hello ${username}, have a nice day.`
     },
     logout_success: "See you again.",
-    info_update_succes: "Update user information successfully."
+    info_update_succes: "Update user information successfully.",
+    user_password_updated: "Your password has change successfully"
 
 }
 

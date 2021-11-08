@@ -2,6 +2,31 @@ let userAvatar = null
 let userInfor = {}
 let originAvatarSrc = null
 let originUserInfor = {}
+let userUpdatePassword = {}
+
+function callLogout() {
+    let timerInterval;
+    Swal.fire({
+        position: "top-end",
+        title: "Auto logout after 5 seconds",
+        html: "Time : <strong></strong>",
+        showConfirmButton: false,
+        timer: 5000,
+        onBeforeOpen: () => {
+            Swal.showLoading();
+            timerInterval = setInterval(() => {
+                Swal.getContent().querySelector("strong").textContent = Math.ceil(Swal.getTimerLeft() / 1000)
+            }, 1000)
+        },
+        onClose: () => {
+            clearInterval(timerInterval)
+        }
+    }).then(result => {
+        $.get("/logout", function () {
+            location.reload()
+        })
+    })
+}
 
 function updateUserInfor() {
 
@@ -47,10 +72,10 @@ function updateUserInfor() {
         }
     })
 
-    //information
+    //USER INFORMATION MODAL
     $("#input-change-username").bind("change", function () {
         let username = $(this).val()
-        let regexUsername = new RegExp("^[\s0-9a-zA-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ ]+$")
+        let regexUsername = new RegExp(/^[\s0-9a-zA-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ ]+$/)
         if (!regexUsername.test(username) || username.length < 3 || username.length > 17) {
             alertify.notify("Username length between 3 and 17 without special character.", "error", 7)
             $(this).val(originUserInfor.username)
@@ -93,7 +118,7 @@ function updateUserInfor() {
     })
     $("#input-change-phone").bind("change", function () {
         let phone = $(this).val()
-        let phoneRegex = new RegExp("^(0)[0-9]{9,10}$")
+        let phoneRegex = new RegExp(/^(0)[0-9]{9,10}$/)
         if (!phoneRegex.test(phone)) {
             alertify.notify("Vietnamese phone number is 10 number.", "error", 7)
             $(this).val(originUserInfor.phone)
@@ -101,6 +126,47 @@ function updateUserInfor() {
             return false
         }
         userInfor.phone = phone
+    })
+
+    ///PASSWORD MODAL
+    $("#input-change-current-password").bind("change", function () {
+        let currentPassword = $(this).val()
+        let passwordRegex = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,}$/)
+        if (!passwordRegex.test(currentPassword)) {
+            alertify.notify("Password at least 8 character within upper,lower case, number, and special chars.", "error", 7)
+            $(this).val(null)
+            delete userUpdatePassword.currentPassword
+            return false
+        }
+        userUpdatePassword.currentPassword = currentPassword
+    })
+    $("#input-change-new-password").bind("change", function () {
+        let newPassword = $(this).val()
+        let passwordRegex = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,}$/)
+        if (!passwordRegex.test(newPassword)) {
+            alertify.notify("Password at least 8 character within upper,lower case, number, and special chars.", "error", 7)
+            $(this).val(null)
+            delete userUpdatePassword.newPassword
+            return false
+        }
+        userUpdatePassword.newPassword = newPassword
+    })
+    $("#input-change-confirm-new-password").bind("change", function () {
+        let confirmNewPassword = $(this).val()
+
+        if (!userUpdatePassword.newPassword) {
+            alertify.notify("You need to enter new password first.", "error", 7)
+            $(this).val(null)
+            delete userUpdatePassword.confirmNewPassword
+            return false
+        }
+        if (confirmNewPassword !== userUpdatePassword.newPassword) {
+            alertify.notify("Confirmation password does not match new password", "error", 7)
+            $(this).val(null)
+            delete userUpdatePassword.confirmNewPassword
+            return false
+        }
+        userUpdatePassword.confirmNewPassword = confirmNewPassword
     })
 }
 
@@ -141,7 +207,6 @@ function callUpdateUserInfo() {
         type: "put",
         data: userInfor,
         success: function (result) {
-            console.log(result);
             //display success
             $(".user-modal-alert-success").find("span").text(result.message)
             $(".user-modal-alert-success").css("display", "block")
@@ -156,6 +221,32 @@ function callUpdateUserInfo() {
             $(".user-modal-alert-error").find("span").text(error.responseText)
             $(".user-modal-alert-error").css("display", "block")
             $("#input-btn-cancel-update-user").click()
+        }
+    })
+}
+
+function callUpdateUserPassword() {
+    $.ajax({
+        url: "/user/update-password",
+        type: "put",
+        data: userUpdatePassword,
+        success: function (result) {
+            //display success
+            $(".user-modal-password-alert-success").find("span").text(result.message)
+            $(".user-modal-password-alert-error").css("display", "none")
+            $(".user-modal-password-alert-success").css("display", "block")
+            $("#input-btn-cancel-update-user-password").click()
+            userUpdatePassword = {}
+
+            //logout after change
+
+        },
+        error: function (error) {
+            //display error
+            $(".user-modal-password-alert-error").find("span").text(error.responseText)
+            $(".user-modal-password-alert-success").css("display", "none")
+            $(".user-modal-password-alert-error").css("display", "block")
+            $("#input-btn-cancel-update-user-password").click()
         }
     })
 }
@@ -196,9 +287,39 @@ $(document).ready(function () {
             (originUserInfor.gender === "male") ? $("#input-change-gender-male").click() : $("#input-change-gender-female").click()
         $("#input-change-address").val(originUserInfor.address),
             $("#input-change-phone").val(originUserInfor.phone)
+    })
 
+    $("#input-btn-update-user-password").bind("click", function () {
+        console.log(userUpdatePassword)
 
+        if (!userUpdatePassword.currentPassword || !userUpdatePassword.newPassword || !userUpdatePassword.confirmNewPassword) {
+            alertify.notify("Please provide all information required", "error", 7)
+            return false
+        }
+        Swal.fire({
+            title: "Are you sure to change the password?",
+            text: "You won't be able to revert this!",
+            icon: "info",
+            showCancelButton: true,
+            confirmButtonColor: "#2ECC71",
+            cancelButtonColor: "#ff7675",
+            confirmButtonText: "Yes, change it now!",
+        }).then((result) => {
+            if (!result.value) {
+                $("#input-btn-cancel-update-user-password").click()
+                return false
+            }
+            callUpdateUserPassword()
+            callLogout()
+        })
 
+    })
+
+    $("#input-btn-cancel-update-user-password").bind("click", function () {
+        userUpdatePassword = {}
+        $("#input-change-current-password").val(null)
+        $("#input-change-new-password").val(null)
+        $("#input-change-confirm-new-password").val(null)
     })
 
 })
